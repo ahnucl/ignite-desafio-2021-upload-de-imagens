@@ -2,6 +2,7 @@ import { Button, Box } from '@chakra-ui/react';
 import { useMemo } from 'react';
 import { useInfiniteQuery } from 'react-query';
 
+import axios from 'axios';
 import { Header } from '../components/Header';
 import { CardList } from '../components/CardList';
 import { api } from '../services/api';
@@ -9,6 +10,15 @@ import { Loading } from '../components/Loading';
 import { Error } from '../components/Error';
 
 export default function Home(): JSX.Element {
+
+  async function requestImages({ pageParam = null }: { pageParam: number | null }) {
+    const { data } = await axios.get('/api/images', { params: {
+      after: pageParam
+    }})
+
+    return data
+  }
+
   const {
     data,
     isLoading,
@@ -18,8 +28,9 @@ export default function Home(): JSX.Element {
     hasNextPage,
   } = useInfiniteQuery(
     'images',
-    // TODO AXIOS REQUEST WITH PARAM
-    ,
+    api.get(async () => axios.get('/api/images', { params: {
+      after:
+    } }))
     // TODO GET AND RETURN NEXT PAGE PARAM
   );
 

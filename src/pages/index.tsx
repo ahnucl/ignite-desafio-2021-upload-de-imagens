@@ -31,10 +31,10 @@ async function requestImages({ pageParam = null } = {}): Promise<ImagesQuery> {
   return data;
 }
 
-function getNextPageParam(lastReqResult: ImagesQuery): number | null {
-  console.log('after', lastReqResult.after);
+function getNextPageParam({ after }: ImagesQuery): number | null {
+  console.log('after', after);
 
-  return lastReqResult.after;
+  return after;
 }
 
 export default function Home(): JSX.Element {
@@ -52,8 +52,17 @@ export default function Home(): JSX.Element {
   });
 
   const formattedData = useMemo(() => {
-    // TODO FORMAT AND FLAT DATA ARRAY
+    // Acho que é isso, preciso testar
+    if (!data) {
+      return [];
+    }
+
+    return data.pages.map(page => page.data).flat();
   }, [data]);
+
+  const handleLoadMore = (): void => {
+    console.log('handleLoadMore');
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -69,7 +78,16 @@ export default function Home(): JSX.Element {
 
       <Box maxW={1120} px={20} mx="auto" my={20}>
         <CardList cards={formattedData} />
-        {/* TODO RENDER LOAD MORE BUTTON IF DATA HAS NEXT PAGE */}
+
+        {hasNextPage && (
+          <Button
+            onClick={handleLoadMore}
+            isLoading={isFetchingNextPage}
+            loadingText="Carregando..."
+          >
+            Carregar mais
+          </Button>
+        )}
       </Box>
     </>
   );

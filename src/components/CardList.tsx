@@ -26,7 +26,7 @@ export function CardList({ cards }: CardsProps): JSX.Element {
 
   return (
     <>
-      <SimpleGrid columns={3}>
+      <SimpleGrid columns={3} gap={10}>
         {cards.map(card => (
           <Card key={card.id} data={card} viewImage={handleViewImage} />
         ))}

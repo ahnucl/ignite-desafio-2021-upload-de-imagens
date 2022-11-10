@@ -61,7 +61,7 @@ export default function Home(): JSX.Element {
   }, [data]);
 
   const handleLoadMore = (): void => {
-    console.log('handleLoadMore');
+    fetchNextPage();
   };
 
   if (isLoading) {
@@ -84,6 +84,7 @@ export default function Home(): JSX.Element {
             onClick={handleLoadMore}
             isLoading={isFetchingNextPage}
             loadingText="Carregando..."
+            mt={10}
           >
             Carregar mais
           </Button>

@@ -2,23 +2,42 @@ import { Button, Box } from '@chakra-ui/react';
 import { useMemo } from 'react';
 import { useInfiniteQuery } from 'react-query';
 
-import axios from 'axios';
 import { Header } from '../components/Header';
 import { CardList } from '../components/CardList';
 import { api } from '../services/api';
 import { Loading } from '../components/Loading';
 import { Error } from '../components/Error';
 
+interface ImagesQuery {
+  data: {
+    title: string;
+    description: string;
+    url: string;
+    ts: number;
+    id: string;
+  }[];
+  after: number | null;
+}
+
+async function requestImages({ pageParam = null } = {}): Promise<ImagesQuery> {
+  const { data } = await api.get('/api/images', {
+    params: {
+      after: pageParam,
+    },
+  });
+
+  console.log('data', data);
+
+  return data;
+}
+
+function getNextPageParam(lastReqResult: ImagesQuery): number | null {
+  console.log('after', lastReqResult.after);
+
+  return lastReqResult.after;
+}
+
 export default function Home(): JSX.Element {
-
-  async function requestImages({ pageParam = null }: { pageParam: number | null }) {
-    const { data } = await axios.get('/api/images', { params: {
-      after: pageParam
-    }})
-
-    return data
-  }
-
   const {
     data,
     isLoading,
@@ -26,21 +45,23 @@ export default function Home(): JSX.Element {
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
-  } = useInfiniteQuery(
-    'images',
-    api.get(async () => axios.get('/api/images', { params: {
-      after:
-    } }))
-    // TODO GET AND RETURN NEXT PAGE PARAM
-  );
+  } = useInfiniteQuery({
+    queryKey: 'images',
+    queryFn: requestImages,
+    getNextPageParam,
+  });
 
   const formattedData = useMemo(() => {
     // TODO FORMAT AND FLAT DATA ARRAY
   }, [data]);
 
-  // TODO RENDER LOADING SCREEN
+  if (isLoading) {
+    return <Loading />;
+  }
 
-  // TODO RENDER ERROR SCREEN
+  if (isError) {
+    return <Error />;
+  }
 
   return (
     <>
